@@ -1,3 +1,6 @@
+<img width="1279" height="927" alt="FalloutTTRPG_CharCreator_App" src="https://github.com/user-attachments/assets/c29bf759-d74e-4197-bb59-f9d9337ed9c3" />
+
+
 Rules from the Character Creation chapter from the Fallout 111 Table Top Roleplay Core Rulebook that the app follows:
 
 Origin: one of Brotherhood Initiate, Ghoul, Super Mutant, Mister Handy, Survivor or Vault Dweller, with that origin’s special rules applied. That includes the super mutant attribute limits, the ghoul’s free Survival tag, the extra tag skill for Brotherhood and Vault Dwellers, and the Survivor’s two traits (or one trait plus a second perk).
