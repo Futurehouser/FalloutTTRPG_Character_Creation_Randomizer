@@ -19,6 +19,6 @@ Super mutants: single names, a title like “Uncle”, or two names blended toge
 Robots: butler-style names with a title, like Sergeant or Miss, or a model number.
 Gimmick: each character gets a nickname and a personality quirk based on their highest S.P.E.C.I.A.L. score, their lowest one and their perk. For example, Endurance 10 with low Charisma and the Pain Train perk gave “Unkillable”, who eats week-old mirelurk but whose small talk peaks at grunting, and who blows a train whistle before every charge. The quirk goes in the Perks & Traits list. A “Wasteland Dossier” strip under the sheet holds the longer backstory and notes on the choices it made.
 
-The source code is in FalloutCharGen/ (gamedata.py has the rules data, generator.py builds the character and render.py fills in the sheet).
+The source code is gamedata.py has the rules data, generator.py builds the character and render.py fills in the sheet.
 
-The app is at FalloutCharGen\dist\FalloutCharGen.exe inside that folder. You can move the exe anywhere, since it’s a single file. New characters are saved in a Fallout Characters folder next to wherever the exe is.
+The app is FalloutCharGen.exe. You can move the exe anywhere, since it’s a single file. New characters are saved in a Fallout Characters folder next to wherever the exe is.
