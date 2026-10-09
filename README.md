@@ -27,4 +27,5 @@ Gimmick: each character gets a nickname and a personality quirk based on their h
 The source code is gamedata.py has the rules data, generator.py builds the character and render.py fills in the sheet.
 
 The app is "FalloutCharGen.exe". You can move the exe anywhere, since it’s a single file. New characters are saved in a Fallout Characters folder next to wherever the exe is.
+
 The android version app is located within "FalloutCharGenAndroid" folder, and it is "WastelandRecruit.apk". Just download that apk file to your android device and install it. Allow the installation anyways if your device doesn't trust the app.
