@@ -87,7 +87,10 @@
   <section class="page" id="page-perks" data-title="Random FO76 Perk">
     <h2>Random Fallout 76 Perk</h2>
     <p class="hint">Picks a random perk card from the <a href="https://fallout.wiki/wiki/Fallout_76_Perks" target="_blank" rel="noopener">fallout.wiki Fallout 76 Perks</a> page. Needs internet the first time.</p>
-    <div class="row">
+    <div><label class="f">Suggest for a saved character (optional)</label>
+      <select id="pk-char"><option value="">Nobody: fully random perk</option></select></div>
+    <div id="pk-charinfo" class="hint" style="margin:6px 0 10px"></div>
+    <div class="row" id="pk-filters">
       <div><label class="f">Perk type</label><select id="pk-group"><option value="">Any</option><option>Regular</option><option>Ghoul</option></select></div>
       <div><label class="f">S.P.E.C.I.A.L.</label><select id="pk-special"><option value="">Any</option>
         <option>Strength</option><option>Perception</option><option>Endurance</option><option>Charisma</option>
@@ -101,7 +104,8 @@
   <!-- 5. create character -->
   <section class="page" id="page-create" data-title="Create Character">
     <h2 id="cr-title">Create Character</h2>
-    <p class="hint">Fill in your character and save it. It will appear under <b>Saved Characters</b>.</p>
+    <p class="hint" id="cr-hint">Fill in your character and save it. It will appear under <b>Saved Characters</b>.</p>
+    <div class="card levelup" id="cr-levelup" hidden></div>
     <div class="card">
       <div class="photo-pick">
         <div class="avatar" id="cr-avatar">&#128100;</div>
@@ -126,6 +130,15 @@
     <div class="card">
       <h4 style="margin-top:0">Skills <span class="muted" style="text-transform:none;letter-spacing:0">(rank 0&ndash;6, tick = Tag skill)</span></h4>
       <div class="skills" id="cr-skills"></div>
+    </div>
+    <div class="card">
+      <h4 style="margin-top:0">Fallout 76 perk cards <span class="muted" style="text-transform:none;letter-spacing:0">(used for perk suggestions)</span></h4>
+      <div id="cr-cards"></div>
+      <div class="row" style="margin-top:8px">
+        <div style="flex:3 1 200px"><input type="text" id="cr-cardname" list="cr-perklist" placeholder="Type a perk name to add it"><datalist id="cr-perklist"></datalist></div>
+        <div style="flex:1 1 90px"><button class="btn" id="cr-cardadd" style="width:100%">+ Add card</button></div>
+      </div>
+      <div class="muted" id="cr-cardnote" style="font-size:12px;margin-top:6px"></div>
     </div>
     <div class="card">
       <label class="f">Notes (optional)</label>

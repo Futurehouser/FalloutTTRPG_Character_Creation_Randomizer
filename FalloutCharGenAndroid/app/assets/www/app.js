@@ -16,6 +16,7 @@ function confirmBox(text, yesLabel = "Delete") {
     $("modal-no").onclick = () => done(false);
   });
 }
+const clamp = (v, lo, hi, d) => { v = parseInt(v, 10); return isNaN(v) ? d : Math.min(hi, Math.max(lo, v)); };
 const safeName = s => (String(s).replace(/[^A-Za-z0-9 _-]+/g, "").trim().replace(/ /g, "_") || "character");
 
 // ------------------------------------------------------------------ navigation
@@ -28,6 +29,8 @@ function showPage(id) {
   $("main").scrollTop = 0;
   currentPage = id;
   if (id === "roster") renderRoster();
+  if (id === "perks") fillCharSelect();
+  if (id === "create") fillPerkList();
 }
 $("burger").onclick = () => document.body.classList.toggle("menu-open");
 $("scrim").onclick = () => document.body.classList.remove("menu-open");
@@ -180,7 +183,56 @@ $("lt-treset").onclick = async () => {
   buildLootEditor(); toast(`${cat} table reset`);
 };
 
-// ------------------------------------------------------------------ 4. random perk
+// ------------------------------------------------------------------ 4. random perk / suggestion
+let pkSkip = [];
+const pkChar = () => ROSTER.find(x => x.id === $("pk-char").value) || null;
+
+function fillCharSelect() {
+  const sel = $("pk-char"), keep = sel.value;
+  sel.innerHTML = `<option value="">Nobody: fully random perk</option>` + ROSTER.slice()
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map(c => `<option value="${esc(c.id)}">${esc(c.name)} (level ${c.level || 1})</option>`).join("");
+  sel.value = ROSTER.some(c => c.id === keep) ? keep : "";
+  updateCharInfo();
+}
+
+// small S.P.E.C.I.A.L. grid: points spent on perk cards / attribute value
+function pointsGrid(special, cards) {
+  const used = pointsUsed({ perkCards: cards });
+  return `<div class="pts">${G.SPECIAL.map(k => {
+    const u = used[k] || 0, max = special[k] || 0, over = u > max;
+    return `<div class="${u >= max ? "full" : ""}" style="${over ? "border-color:var(--red)" : ""}" title="${SPECIAL_FULL[k]}">
+      ${k}<br><b style="${over ? "color:var(--red)" : ""}">${u}/${max}</b></div>`;
+  }).join("")}</div>`;
+}
+const cardsOwned = c => (c.perkCards || []).reduce((n, x) => n + x.rank, 0);
+
+function updateCharInfo() {
+  const c = pkChar();
+  pkSkip = [];
+  $("pk-gen").textContent = c ? "SUGGEST A PERK" : "RANDOM PERK";
+  if (!c) { $("pk-charinfo").innerHTML = ""; return; }
+  const owned = cardsOwned(c), lvl = c.level || 1;
+  $("pk-charinfo").innerHTML = `<b>${esc(c.name)}</b>: level ${lvl}, ${owned} perk card${owned === 1 ? "" : "s"} picked
+    (Fallout 76 gives one per level${owned >= lvl ? `. <span style="color:var(--red)">All picks for this level are used: level up first, or treat the suggestion as a plan</span>` : ""}).
+    Points spent per S.P.E.C.I.A.L.:${pointsGrid(c.special, c.perkCards || [])}
+    ${isGhoul(c) ? "Ghoul origin: Ghoul perks are included." : "Ghoul perks are only suggested if the character's origin says Ghoul."}`;
+}
+$("pk-char").onchange = () => { updateCharInfo(); $("pk-out").innerHTML = ""; };
+
+function perkHtml(p, opts = {}) {
+  const ranks = p.ranks.map((r, i) => `<div class="rank" style="${opts.rank === i + 1 ? "border-left-color:var(--green)" : opts.rank ? "opacity:.6" : ""}">
+    <b>Rank ${esc(r.rank)}</b>${opts.rank === i + 1 ? " &larr; suggested" : ""}: ${esc(r.desc)}</div>`).join("");
+  return `<div class="card perk">
+    <img src="${esc(p.image)}" alt="${esc(p.name)} perk card" referrerpolicy="no-referrer" onerror="if(this.src!=='${esc(p.thumb)}')this.src='${esc(p.thumb)}'">
+    <div class="txt"><h3>${esc(p.name)}</h3>
+      <div class="badges"><span class="badge"><b>${esc(p.special)}</b></span><span class="badge">${esc(p.group)} perk</span>
+      <span class="badge">Unlocks at level <b>${esc(p.level)}</b></span><span class="badge">${p.ranks.length} rank${p.ranks.length > 1 ? "s" : ""}</span></div>
+      ${opts.extra || ""}${ranks}
+      <div class="muted" style="font-size:12px;margin-top:10px">Source: <a href="${esc(p.link)}" target="_blank" rel="noopener">fallout.wiki</a>
+      &middot; ${opts.footer || ""}</div></div></div>`;
+}
+
 $("pk-gen").onclick = async () => {
   $("pk-gen").disabled = true;
   $("pk-out").innerHTML = `<div class="card muted">Loading perks from fallout.wiki&hellip;</div>`;
@@ -188,17 +240,41 @@ $("pk-gen").onclick = async () => {
     const { perks, source } = await loadPerks();
     const g = $("pk-group").value, s = $("pk-special").value;
     const pool = perks.filter(p => (!g || p.group === g) && (!s || p.special.toLowerCase().startsWith(s.toLowerCase())));
+    const off = source === "cache" ? " &middot; offline copy" : "";
     if (!pool.length) { $("pk-out").innerHTML = `<div class="card">No perks match those filters.</div>`; return; }
-    const p = choice(pool);
-    const ranks = p.ranks.map(r => `<div class="rank"><b>Rank ${esc(r.rank)}</b>: ${esc(r.desc)}</div>`).join("");
-    $("pk-out").innerHTML = `<div class="card perk">
-      <img src="${esc(p.image)}" alt="${esc(p.name)} perk card" referrerpolicy="no-referrer" onerror="if(this.src!=='${esc(p.thumb)}')this.src='${esc(p.thumb)}'">
-      <div class="txt"><h3>${esc(p.name)}</h3>
-        <div class="badges"><span class="badge"><b>${esc(p.special)}</b></span><span class="badge">${esc(p.group)} perk</span>
-        <span class="badge">Unlocks at level <b>${esc(p.level)}</b></span><span class="badge">${p.ranks.length} rank${p.ranks.length > 1 ? "s" : ""}</span></div>
-        ${ranks}
-        <div class="muted" style="font-size:12px;margin-top:10px">Source: <a href="${esc(p.link)}" target="_blank" rel="noopener">fallout.wiki</a>
-        &middot; ${pool.length} perks in this pool${source === "cache" ? " &middot; offline copy" : ""}</div></div></div>`;
+    const ch = pkChar();
+    if (!ch) {
+      $("pk-out").innerHTML = perkHtml(choice(pool), { footer: `${pool.length} perks in this pool${off}` });
+      return;
+    }
+    let { pick, total } = suggestPerk(ch, pool, pkSkip);
+    if (!pick && pkSkip.length) { pkSkip = []; ({ pick, total } = suggestPerk(ch, pool, pkSkip)); }
+    if (!pick) {
+      $("pk-out").innerHTML = `<div class="card">Nothing fits ${esc(ch.name)} right now: every S.P.E.C.I.A.L. is out of free points,
+        or the remaining perks need a higher level. Level up the character (Saved Characters &rarr; Level up), or loosen the filters.</div>`;
+      return;
+    }
+    pkSkip.push(pick.perk.name);
+    const head = pick.kind === "upgrade" ? `Rank up to <b>${pick.rank}</b>` : "New perk card";
+    $("pk-out").innerHTML = perkHtml(pick.perk, {
+      rank: pick.rank,
+      extra: `<div class="why"><b>${head}</b> for ${esc(ch.name)}: ${pick.reasons.map(esc).join("; ")}.</div>
+        <div class="bar" style="margin:8px 0"><button class="btn primary" id="pk-add">&#10010; Add to ${esc(ch.name)}</button>
+        <button class="btn" id="pk-again">&#8635; Suggest another</button></div>`,
+      footer: `${total} perk${total === 1 ? "" : "s"} fit this character${off}`,
+    });
+    $("pk-again").onclick = () => $("pk-gen").click();
+    $("pk-add").onclick = async () => {
+      const c = pkChar();
+      if (!c) return;
+      c.perkCards = c.perkCards || [];
+      const have = c.perkCards.find(x => x.name === pick.perk.name);
+      if (have) have.rank = pick.rank; else c.perkCards.push(perkCardFrom(pick.perk, pick.rank));
+      await addToRoster(c);
+      toast(`${pick.perk.name} rank ${pick.rank} added to ${c.name}`);
+      $("pk-add").disabled = true; $("pk-add").textContent = "Added ✓";
+      const keep = pkSkip; fillCharSelect(); pkSkip = keep;
+    };
   } catch (e) {
     $("pk-out").innerHTML = `<div class="card">${esc(e.message)}</div>`;
   } finally {
@@ -207,7 +283,7 @@ $("pk-gen").onclick = async () => {
 };
 
 // ------------------------------------------------------------------ 5. create / edit character
-let ROSTER = [], editingId = null, crPhoto = null;
+let ROSTER = [], editingId = null, crPhoto = null, crCards = [];
 G.SPECIAL.forEach(a => $("cr-special").insertAdjacentHTML("beforeend",
   `<div><label for="cr-s-${a}" title="${SPECIAL_FULL[a]}">${a}</label><input type="number" id="cr-s-${a}" min="1" max="12" value="5" inputmode="numeric"></div>`));
 G.SKILLS.forEach(([s, a]) => $("cr-skills").insertAdjacentHTML("beforeend",
@@ -218,26 +294,85 @@ function setAvatar(el, photo, name) {
   el.innerHTML = photo ? `<img src="${photo}" alt="">` : esc((name || "?").trim().charAt(0).toUpperCase() || "?");
 }
 function resetForm() {
-  editingId = null; crPhoto = null;
+  editingId = null; crPhoto = null; crCards = [];
   $("cr-title").textContent = "Create Character";
+  $("cr-hint").innerHTML = "Fill in your character and save it. It will appear under <b>Saved Characters</b>.";
+  $("cr-levelup").hidden = true;
   $("cr-name").value = ""; $("cr-origin").value = ""; $("cr-level").value = 1; $("cr-notes").value = "";
   G.SPECIAL.forEach(a => ($("cr-s-" + a).value = 5));
   G.SKILL_NAMES.forEach(s => { $("cr-k-" + safeName(s)).value = 0; $("cr-t-" + safeName(s)).checked = false; });
   $("cr-avatar").innerHTML = "&#128100;";
   $("cr-save").textContent = "SAVE CHARACTER";
+  $("cr-clear").textContent = "Clear form";
+  renderCrCards();
 }
-function fillForm(c) {
+function fillForm(c, levelUp = false) {
   editingId = c.id; crPhoto = c.photo || null;
-  $("cr-title").textContent = "Edit " + c.name;
-  $("cr-name").value = c.name; $("cr-origin").value = c.origin || ""; $("cr-level").value = c.level || 1; $("cr-notes").value = c.notes || "";
+  crCards = JSON.parse(JSON.stringify(c.perkCards || []));
+  $("cr-title").textContent = (levelUp ? "Level up " : "Edit ") + c.name;
+  $("cr-hint").innerHTML = "Change anything you need, then press <b>Save changes</b>. Nothing is changed until you save.";
+  $("cr-name").value = c.name; $("cr-origin").value = c.origin || ""; $("cr-notes").value = c.notes || "";
+  $("cr-level").value = Math.min(50, (c.level || 1) + (levelUp ? 1 : 0));
   G.SPECIAL.forEach(a => ($("cr-s-" + a).value = c.special[a]));
   G.SKILL_NAMES.forEach(s => {
     $("cr-k-" + safeName(s)).value = c.skills[s] || 0;
     $("cr-t-" + safeName(s)).checked = (c.tags || []).includes(s);
   });
   setAvatar($("cr-avatar"), crPhoto, c.name);
+  const lu = $("cr-levelup");
+  lu.hidden = !levelUp;
+  if (levelUp) lu.innerHTML = `&#11014; <b>${esc(c.name)}: level ${c.level || 1} &rarr; ${$("cr-level").value}</b><br>
+    Raise whatever went up this level (S.P.E.C.I.A.L., skill ranks, perk cards, notes), then press <b>Save changes</b>.
+    In Fallout 76 terms that's +1 to one S.P.E.C.I.A.L. and one new perk card. Use <b>Random FO76 Perk</b> afterwards for a suggestion.`;
   $("cr-save").textContent = "SAVE CHANGES";
+  $("cr-clear").textContent = "Cancel editing";
+  renderCrCards();
 }
+
+// ---- perk cards inside the form
+function crSpecial() {
+  const sp = {};
+  G.SPECIAL.forEach(a => (sp[a] = clamp($("cr-s-" + a).value, 1, 12, 5)));
+  return sp;
+}
+function renderCrCards() {
+  const box = $("cr-cards");
+  if (!crCards.length) {
+    box.innerHTML = `<div class="muted" style="font-size:13px">No perk cards yet. Add them here, or from the Random FO76 Perk page.</div>`;
+  } else {
+    box.innerHTML = crCards.map((c, i) => `<div class="pcard"><img src="${esc(c.thumb || c.image)}" alt="" referrerpolicy="no-referrer">
+      <div class="t"><b>${esc(c.name)}</b><small>${esc(c.special)} &middot; unlocks at level ${c.level}</small></div>
+      <select data-i="${i}" title="Rank">${c.ranks.map((r, k) => `<option value="${k + 1}" ${k + 1 === c.rank ? "selected" : ""}>Rank ${k + 1} (cost ${r.cost})</option>`).join("")}</select>
+      <button class="btn danger" data-rm="${i}" title="Remove">&#10005;</button></div>`).join("");
+  }
+  box.insertAdjacentHTML("beforeend", `<div class="muted" style="font-size:12px;margin-top:6px">Points spent / S.P.E.C.I.A.L. value (red = over the limit):</div>` + pointsGrid(crSpecial(), crCards));
+  box.querySelectorAll("select[data-i]").forEach(sel => (sel.onchange = () => { crCards[+sel.dataset.i].rank = +sel.value; renderCrCards(); }));
+  box.querySelectorAll("[data-rm]").forEach(b => (b.onclick = () => { crCards.splice(+b.dataset.rm, 1); renderCrCards(); }));
+}
+G.SPECIAL.forEach(a => $("cr-s-" + a).addEventListener("input", renderCrCards));
+
+async function fillPerkList() {
+  try {
+    const { perks } = await loadPerks();
+    $("cr-perklist").innerHTML = perks.map(p => `<option value="${esc(p.name)}">${esc(p.special)}${p.group === "Ghoul" ? " (Ghoul)" : ""}</option>`).join("");
+    $("cr-cardnote").textContent = "";
+  } catch (e) {
+    $("cr-cardnote").textContent = "The perk list downloads from fallout.wiki: connect to the internet once to add cards here.";
+  }
+}
+$("cr-cardadd").onclick = async () => {
+  const name = $("cr-cardname").value.trim().toLowerCase();
+  if (!name) return;
+  let perks = [];
+  try { perks = (await loadPerks()).perks; } catch (e) { toast("Perk list not available offline yet"); return; }
+  const p = perks.find(x => x.name.toLowerCase() === name);
+  if (!p) { toast("Pick a perk name from the list"); return; }
+  if (crCards.some(c => c.name === p.name)) { toast(`${p.name} is already on this character`); return; }
+  crCards.push(perkCardFrom(p, 1));
+  $("cr-cardname").value = "";
+  renderCrCards();
+};
+$("cr-cardname").addEventListener("keydown", e => { if (e.key === "Enter") $("cr-cardadd").click(); });
 
 // shrink photos so the saved list stays small
 function shrinkPhoto(file) {
@@ -267,16 +402,22 @@ $("cr-photo").onchange = async e => {
   e.target.value = "";
 };
 $("cr-nophoto").onclick = () => { crPhoto = null; $("cr-avatar").innerHTML = "&#128100;"; };
-$("cr-clear").onclick = resetForm;
+$("cr-clear").onclick = () => {
+  const id = editingId;
+  resetForm();
+  if (id) { openProfileId = id; showPage("roster"); }
+};
 
-const clamp = (v, lo, hi, d) => { v = parseInt(v, 10); return isNaN(v) ? d : Math.min(hi, Math.max(lo, v)); };
 $("cr-save").onclick = async () => {
   const name = $("cr-name").value.trim();
   if (!name) { toast("Give your character a name first"); $("cr-name").focus(); return; }
+  const before = editingId ? ROSTER.find(x => x.id === editingId) : null;
   const c = {
+    ...(before || {}), // keep anything this form doesn't show
     id: editingId || "c" + Date.now() + Math.floor(Math.random() * 1000),
     name, origin: $("cr-origin").value.trim(), level: clamp($("cr-level").value, 1, 50, 1),
     special: {}, skills: {}, tags: [], photo: crPhoto, notes: $("cr-notes").value.trim(),
+    perkCards: crCards,
   };
   G.SPECIAL.forEach(a => (c.special[a] = clamp($("cr-s-" + a).value, 1, 12, 5)));
   G.SKILL_NAMES.forEach(s => {
@@ -333,12 +474,25 @@ function renderRoster() {
           <td style="text-align:right"><b>${c.skills[s] || 0}</b></td><td style="text-align:right" class="muted">TN ${c.special[a] + (c.skills[s] || 0)}</td></tr>`).join("")}</table>
           <div class="muted" style="font-size:12px;margin-top:4px">&#9733; = Tag skill. TN = attribute + skill rank.</div>`
           : `<div class="muted">No skill ranks yet.</div>`}
+        <h4>Fallout 76 perk cards</h4>
+        ${(c.perkCards || []).length ? (c.perkCards || []).map(pc => `<div class="pcard"><img src="${esc(pc.thumb || pc.image)}" alt="" referrerpolicy="no-referrer">
+          <div class="t"><b>${esc(pc.name)}</b> <span class="muted">rank ${pc.rank} &middot; ${esc(pc.special)} &middot; cost ${cardCost(pc)}</span>
+          <small style="white-space:normal">${esc((pc.ranks[pc.rank - 1] || {}).desc || "")}</small></div></div>`).join("")
+          + `<div class="muted" style="font-size:12px;margin-top:6px">Points spent / S.P.E.C.I.A.L. value:</div>` + pointsGrid(c.special, c.perkCards)
+          : `<div class="muted">None yet. Tap <b>Suggest a perk</b> to get one picked for this character.</div>`}
         ${c.notes ? `<h4>Notes</h4><div style="white-space:pre-wrap;font-size:14px;line-height:1.45">${esc(c.notes)}</div>` : ""}
-        <div class="bar" style="margin-top:16px"><button class="btn" id="ro-edit">&#9998; Edit</button><button class="btn danger" id="ro-del">&#128465; Delete</button></div>
+        <div class="bar" style="margin-top:16px"><button class="btn primary" id="ro-lvl">&#11014; Level up</button>
+          <button class="btn" id="ro-sug">&#9733; Suggest a perk</button></div>
+        <div class="bar"><button class="btn" id="ro-edit">&#9998; Edit</button><button class="btn danger" id="ro-del">&#128465; Delete</button></div>
       </div>`;
     setAvatar($("ro-av"), c.photo, c.name);
     $("ro-back").onclick = closeProfile;
     $("ro-edit").onclick = () => { fillForm(c); showPage("create"); };
+    $("ro-lvl").onclick = () => {
+      if ((c.level || 1) >= 50) { toast("Already at the maximum level (50)"); return; }
+      fillForm(c, true); showPage("create");
+    };
+    $("ro-sug").onclick = () => { showPage("perks"); $("pk-char").value = c.id; updateCharInfo(); $("pk-out").innerHTML = ""; $("pk-gen").click(); };
     $("ro-del").onclick = () => deleteChar(c);
     return;
   }
@@ -350,7 +504,7 @@ function renderRoster() {
   const sorted = ROSTER.slice().sort((a, b) => a.name.localeCompare(b.name));
   list.innerHTML = `<p class="hint">${sorted.length} character${sorted.length > 1 ? "s" : ""}. Tap one to see the profile.</p><div class="list">` +
     sorted.map(c => `<div class="entry" data-id="${esc(c.id)}"><div class="avatar" data-av="${esc(c.id)}"></div><div style="flex:1;min-width:0">
-      <b>${esc(c.name)}</b><small>${esc(c.origin || "Unknown origin")} &middot; Lvl ${c.level || 1}</small><br>
+      <b>${esc(c.name)}</b><small>${esc(c.origin || "Unknown origin")} &middot; Lvl ${c.level || 1}${(c.perkCards || []).length ? ` &middot; ${c.perkCards.length} perk card${c.perkCards.length > 1 ? "s" : ""}` : ""}</small><br>
       <small>${G.SPECIAL.map(a => `${a} ${c.special[a]}`).join(" &middot; ")}</small></div>
       <button class="btn danger" data-del="${esc(c.id)}" title="Delete" style="flex:none;padding:8px 11px">&#128465;</button></div>`).join("") + "</div>";
   list.querySelectorAll("[data-av]").forEach(el => { const c = ROSTER.find(x => x.id === el.dataset.av); setAvatar(el, c.photo, c.name); });

@@ -140,3 +140,20 @@ table.lt td.n { width: 64px; }
   .grid7, .statgrid { grid-template-columns: repeat(4, 1fr); }
   .perk img { max-width: 100%; width: 220px; margin: 0 auto; }
 }
+
+/* perk cards on characters */
+.pcard { display: flex; gap: 10px; align-items: center; padding: 8px; margin: 6px 0; background: #0f1115; border: 1px solid var(--line); border-radius: 10px; }
+.pcard img { width: 44px; height: 54px; object-fit: cover; border-radius: 6px; background: var(--panel2); flex: none; }
+.pcard .t { flex: 1; min-width: 0; font-size: 14px; }
+.pcard .t b { color: var(--amber); }
+.pcard .t small { color: var(--muted); display: block; overflow: hidden; text-overflow: ellipsis; }
+.pcard select { width: auto; padding: 6px; }
+.pcard .btn { padding: 7px 10px; flex: none; }
+.pts { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin: 6px 0; text-align: center; font-size: 12px; }
+.pts div { background: #0f1115; border: 1px solid var(--line); border-radius: 8px; padding: 4px 2px; }
+.pts div.full { border-color: var(--amber-d); }
+.pts b { color: var(--amber); }
+.levelup { border-color: var(--amber); background: #2a2614; }
+.levelup b { color: var(--amber); }
+.why { font-size: 13px; color: var(--green); margin: 6px 0; }
+@media (max-width: 520px) { .pts { grid-template-columns: repeat(4, 1fr); } }
