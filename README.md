@@ -1,11 +1,9 @@
 <img width="1279" height="927" alt="FalloutTTRPG\_CharCreator\_App" src="https://github.com/user-attachments/assets/c29bf759-d74e-4197-bb59-f9d9337ed9c3" />
 
 
+App for Windows [**Windows**](https://github.com/Futurehouser/FalloutTTRPG\_Character\_Creation\_Randomizer/blob/main/FalloutCharGen/WastelandRecruit.exe)
 
-App for Windows \[\*\*Windows\*\*](https://github.com/Futurehouser/FalloutTTRPG\_Character\_Creation\_Randomizer/blob/main/FalloutCharGen/WastelandRecruit.exe).
-
-App for Mobile \[\*\*Mobile\*\*](https://github.com/Futurehouser/FalloutTTRPG\_Character\_Creation\_Randomizer/blob/main/FalloutCharGenAndroid/WastelandRecruit.apk).
-
+App for Mobile [**Mobile**](https://github.com/Futurehouser/FalloutTTRPG\_Character\_Creation\_Randomizer/blob/main/FalloutCharGenAndroid/WastelandRecruit.apk)
 
 
 Rules from the Character Creation chapter from the Fallout 111 Table Top Roleplay Core Rulebook that the app follows:
