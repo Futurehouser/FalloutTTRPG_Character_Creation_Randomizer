@@ -6,7 +6,9 @@ App for Windows [**Windows**](https://github.com/Futurehouser/FalloutTTRPG\_Char
 App for Mobile [**Mobile**](https://github.com/Futurehouser/FalloutTTRPG\_Character\_Creation\_Randomizer/blob/main/FalloutCharGenAndroid/WastelandRecruit.apk)
 
 
-Rules from the Character Creation chapter from the Fallout 111 Table Top Roleplay Core Rulebook that the app follows:
+
+# Rules from the Character Creation chapter from the Fallout 111 Table Top Roleplay Core Rulebook that the app follows:
+
 
 Origin: one of Brotherhood Initiate, Ghoul, Super Mutant, Mister Handy, Survivor or Vault Dweller, with that origin’s special rules applied. That includes the super mutant attribute limits, the ghoul’s free Survival tag, the extra tag skill for Brotherhood and Vault Dwellers, and the Survivor’s two traits (or one trait plus a second perk).
 
