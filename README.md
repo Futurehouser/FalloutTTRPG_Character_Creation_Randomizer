@@ -1,4 +1,11 @@
-<img width="1279" height="927" alt="FalloutTTRPG_CharCreator_App" src="https://github.com/user-attachments/assets/c29bf759-d74e-4197-bb59-f9d9337ed9c3" />
+<img width="1279" height="927" alt="FalloutTTRPG\_CharCreator\_App" src="https://github.com/user-attachments/assets/c29bf759-d74e-4197-bb59-f9d9337ed9c3" />
+
+
+
+App for Windows \[\*\*Windows\*\*](https://github.com/Futurehouser/FalloutTTRPG\_Character\_Creation\_Randomizer/blob/main/FalloutCharGen/WastelandRecruit.exe).
+
+App for Mobile \[\*\*Mobile\*\*](https://github.com/Futurehouser/FalloutTTRPG\_Character\_Creation\_Randomizer/blob/main/FalloutCharGenAndroid/WastelandRecruit.apk).
+
 
 
 Rules from the Character Creation chapter from the Fallout 111 Table Top Roleplay Core Rulebook that the app follows:
@@ -17,15 +24,16 @@ Equipment: an equipment pack from the character’s origin, the items each tag s
 
 Names: made by mixing Fallout names for each race:
 
-  - Humans: first name plus surname (for example Boone Dashwood).
-  - Ghouls: sometimes get a nickname.
-  - Super mutants: single names, a title like “Uncle”, or two names blended together (for example Gracus).
-  - Robots: butler-style names with a title, like Sergeant or Miss, or a model number.
+* Humans: first name plus surname (for example Boone Dashwood).
+* Ghouls: sometimes get a nickname.
+* Super mutants: single names, a title like “Uncle”, or two names blended together (for example Gracus).
+* Robots: butler-style names with a title, like Sergeant or Miss, or a model number.
 
-Gimmick: each character gets a nickname and a personality quirk based on their highest S.P.E.C.I.A.L. score, their lowest one and their perk. For example, Endurance 10 with low Charisma and the Pain Train perk gave “Unkillable”, who eats week-old mirelurk but whose small talk peaks at grunting, and who blows a train whistle before every charge. The quirk goes in the Perks & Traits list. A “Wasteland Dossier” strip under the sheet holds the longer backstory and notes on the choices it made.
+Gimmick: each character gets a nickname and a personality quirk based on their highest S.P.E.C.I.A.L. score, their lowest one and their perk. For example, Endurance 10 with low Charisma and the Pain Train perk gave “Unkillable”, who eats week-old mirelurk but whose small talk peaks at grunting, and who blows a train whistle before every charge. The quirk goes in the Perks \& Traits list. A “Wasteland Dossier” strip under the sheet holds the longer backstory and notes on the choices it made.
 
 The source code is gamedata.py has the rules data, generator.py builds the character and render.py fills in the sheet.
 
 The app is "FalloutCharGen.exe". You can move the exe anywhere, since it’s a single file. New characters are saved in a Fallout Characters folder next to wherever the exe is.
 
 The android version app is located within "FalloutCharGenAndroid" folder, and it is "WastelandRecruit.apk". Just download that apk file to your android device and install it. Allow the installation anyways if your device doesn't trust the app.
+
