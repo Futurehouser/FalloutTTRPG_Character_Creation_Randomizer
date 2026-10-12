@@ -1,4 +1,5 @@
-<img width="1279" height="927" alt="FalloutTTRPG\_CharCreator\_App" src="https://github.com/user-attachments/assets/c29bf759-d74e-4197-bb59-f9d9337ed9c3" />
+<img width="1904" height="1032" alt="FOTTRPG_README" src="https://github.com/user-attachments/assets/a8a5331d-1650-4e5a-bcf5-275c8f8d9cff" />
+
 
 
 App for Windows [**Windows**](https://github.com/Futurehouser/FalloutTTRPG\_Character\_Creation\_Randomizer/blob/main/FalloutCharGen/WastelandRecruit.exe)
