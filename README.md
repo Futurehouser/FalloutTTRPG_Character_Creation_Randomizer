@@ -2,7 +2,7 @@
 
 
 
-App for Windows [**Windows**](https://github.com/Futurehouser/FalloutTTRPG\_Character\_Creation\_Randomizer/blob/main/FalloutCharGen/WastelandRecruit.exe)
+App for Windows [**Windows**](https://github.com/Futurehouser/FalloutTTRPG_Character_Creation_Randomizer/blob/main/FalloutCharGen/dist/WastelandRecruit.exe)
 
 App for Mobile [**Mobile**](https://github.com/Futurehouser/FalloutTTRPG\_Character\_Creation\_Randomizer/blob/main/FalloutCharGenAndroid/WastelandRecruit.apk)
 
