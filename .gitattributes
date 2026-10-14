@@ -1,0 +1,3 @@
+# shell scripts and workflows must keep Unix line endings to run in bash / on GitHub
+*.sh text eol=lf
+*.yml text eol=lf
