@@ -37,22 +37,3 @@ The source code lives in the `web` folder, which both apps share: gamedata.js ha
 The Windows app is "WastelandRecruit.exe". You can move the exe anywhere, since it’s a single file. New characters are saved in a Fallout Characters folder next to wherever the exe is.
 
 The Android app is "WastelandRecruit.apk" (link above). Just download that apk file to your android device and install it. Allow the installation anyways if your device doesn't trust the app.
-
-# Updates
-
-Both apps check this repository's latest GitHub Release when they open. If there is a newer version they ask first, then download it, check it and install it (Android shows its own install confirmation). The menu also has "Check for updates".
-
-## Releasing a new version
-
-1. Push your changes to `main`.
-2. On GitHub: **Releases → Draft a new release → Choose a tag**, type a new tag such as `v4.1.0` (always higher than the last one), add notes about what changed, and press **Publish release**.
-3. The **Build release files** action (`.github/workflows/release.yml`) builds `WastelandRecruit.exe` and `WastelandRecruit.apk` with that version number and attaches them to the release. It takes about 5 minutes; watch it in the **Actions** tab.
-
-The Android build needs two repository secrets (**Settings → Secrets and variables → Actions**): `ANDROID_KEYSTORE_B64` and `ANDROID_KEYSTORE_PASSWORD`. The signing key itself is never stored in this repository.
-
-## Building on your own computer
-
-* Windows exe: from `FalloutCharGen`, run `python -m PyInstaller --noconfirm --onefile --windowed --name WastelandRecruit --icon assets/app.ico --add-data "../web;web" desktop_app.py`
-* Android APK: from `FalloutCharGenAndroid`, run `bash build_apk.sh` (needs the Android SDK build tools and the signing key in `~/.wasteland-recruit`).
-* The version number for local builds is in `web/version.js`.
-
