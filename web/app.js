@@ -77,7 +77,8 @@ $("cg-keep").onclick = async () => {
   const c = cgChar;
   const perks = c.perks.map(([p, r]) => `${p} (rank ${r})`).join(", ");
   await addToRoster({
-    name: c.name, origin: c.origin, level: 1, special: Object.assign({}, c.special),
+    name: c.name, origin: c.origin, race: c.race, level: 1, special: Object.assign({}, c.special),
+    maxHp: c.hp, carryWeight: c.carry_max,
     skills: Object.assign({}, c.skills), tags: c.tags.slice(), photo: null,
     notes: `${c.gimmick_long}\n\nArchetype: ${c.archetype}. Equipment pack: ${c.pack}. Perks: ${perks || "none"}.` +
            (c.survivor_traits.length ? ` Traits: ${c.survivor_traits.join(", ")}.` : ""),
@@ -294,8 +295,18 @@ G.SKILLS.forEach(([s, a]) => $("cr-skills").insertAdjacentHTML("beforeend",
   `<div class="skill"><input type="checkbox" id="cr-t-${safeName(s)}" title="Tag skill"><span>${esc(s)} <i>[${a}]</i></span>
    <input type="number" id="cr-k-${safeName(s)}" min="0" max="6" value="0" inputmode="numeric"></div>`));
 
-function setAvatar(el, photo, name) {
-  el.innerHTML = photo ? `<img src="${photo}" alt="">` : esc((name || "?").trim().charAt(0).toUpperCase() || "?");
+// photo if there is one, otherwise the default picture for the character's kind
+function setAvatar(el, c) {
+  el.innerHTML = `<img src="${portraitFor(c)}" alt="">`;
+}
+const crRace = () => $("cr-race").value || raceFromOrigin($("cr-origin").value);
+const crAvatar = () => setAvatar($("cr-avatar"), { photo: crPhoto, race: crRace() });
+const autoMaxHp = s => s.END + s.LCK;
+const autoCarry = s => 150 + 10 * s.STR;
+function crAutoHints() {
+  const s = crSpecial();
+  $("cr-maxhp").placeholder = `Auto: ${autoMaxHp(s)}`;
+  $("cr-carry").placeholder = `Auto: ${autoCarry(s)}`;
 }
 function resetForm() {
   editingId = null; crPhoto = null; crCards = [];
@@ -303,9 +314,10 @@ function resetForm() {
   $("cr-hint").innerHTML = "Fill in your character and save it. It will appear under <b>Saved Characters</b>.";
   $("cr-levelup").hidden = true;
   $("cr-name").value = ""; $("cr-origin").value = ""; $("cr-level").value = 1; $("cr-notes").value = "";
+  $("cr-race").value = ""; $("cr-maxhp").value = ""; $("cr-carry").value = "";
   G.SPECIAL.forEach(a => ($("cr-s-" + a).value = 5));
   G.SKILL_NAMES.forEach(s => { $("cr-k-" + safeName(s)).value = 0; $("cr-t-" + safeName(s)).checked = false; });
-  $("cr-avatar").innerHTML = "&#128100;";
+  crAvatar(); crAutoHints();
   $("cr-save").textContent = "SAVE CHARACTER";
   $("cr-clear").textContent = "Clear form";
   renderCrCards();
@@ -316,13 +328,15 @@ function fillForm(c, levelUp = false) {
   $("cr-title").textContent = (levelUp ? "Level up " : "Edit ") + c.name;
   $("cr-hint").innerHTML = "Change anything you need, then press <b>Save changes</b>. Nothing is changed until you save.";
   $("cr-name").value = c.name; $("cr-origin").value = c.origin || ""; $("cr-notes").value = c.notes || "";
+  $("cr-race").value = c.race || "";
+  $("cr-maxhp").value = c.maxHp || ""; $("cr-carry").value = c.carryWeight || "";
   $("cr-level").value = Math.min(50, (c.level || 1) + (levelUp ? 1 : 0));
   G.SPECIAL.forEach(a => ($("cr-s-" + a).value = c.special[a]));
   G.SKILL_NAMES.forEach(s => {
     $("cr-k-" + safeName(s)).value = c.skills[s] || 0;
     $("cr-t-" + safeName(s)).checked = (c.tags || []).includes(s);
   });
-  setAvatar($("cr-avatar"), crPhoto, c.name);
+  crAvatar(); crAutoHints();
   const lu = $("cr-levelup");
   lu.hidden = !levelUp;
   if (levelUp) lu.innerHTML = `&#11014; <b>${esc(c.name)}: level ${c.level || 1} &rarr; ${$("cr-level").value}</b><br>
@@ -401,11 +415,15 @@ function shrinkPhoto(file) {
 $("cr-photo").onchange = async e => {
   const f = e.target.files && e.target.files[0];
   if (!f) return;
-  try { crPhoto = await shrinkPhoto(f); setAvatar($("cr-avatar"), crPhoto); }
+  try { crPhoto = await shrinkPhoto(f); crAvatar(); }
   catch (err) { toast(err.message || "Couldn't load that photo"); }
   e.target.value = "";
 };
-$("cr-nophoto").onclick = () => { crPhoto = null; $("cr-avatar").innerHTML = "&#128100;"; };
+$("cr-nophoto").onclick = () => { crPhoto = null; crAvatar(); };
+$("cr-race").onchange = crAvatar;
+$("cr-origin").addEventListener("input", () => { if (!crPhoto && !$("cr-race").value) crAvatar(); });
+G.SPECIAL.forEach(a => $("cr-s-" + a).addEventListener("input", crAutoHints));
+crAvatar(); crAutoHints();
 $("cr-clear").onclick = () => {
   const id = editingId;
   resetForm();
@@ -421,7 +439,9 @@ $("cr-save").onclick = async () => {
     id: editingId || "c" + Date.now() + Math.floor(Math.random() * 1000),
     name, origin: $("cr-origin").value.trim(), level: clamp($("cr-level").value, 1, 50, 1),
     special: {}, skills: {}, tags: [], photo: crPhoto, notes: $("cr-notes").value.trim(),
-    perkCards: crCards,
+    perkCards: crCards, race: $("cr-race").value || null,
+    maxHp: $("cr-maxhp").value === "" ? null : clamp($("cr-maxhp").value, 1, 999, null),
+    carryWeight: $("cr-carry").value === "" ? null : clamp($("cr-carry").value, 0, 9999, null),
   };
   G.SPECIAL.forEach(a => (c.special[a] = clamp($("cr-s-" + a).value, 1, 12, 5)));
   G.SKILL_NAMES.forEach(s => {
@@ -456,8 +476,8 @@ function closeProfile() { openProfileId = null; renderRoster(); }
 function derived(c) {
   const s = c.special;
   return [
-    ["Max HP at level 1", s.END + s.LCK], ["Initiative", s.PER + s.AGI],
-    ["Defense", s.AGI >= 9 ? 2 : 1], ["Carry weight", 150 + 10 * s.STR + " lbs"],
+    [c.maxHp ? "Max HP" : "Max HP (auto, level 1)", c.maxHp || autoMaxHp(s)], ["Initiative", s.PER + s.AGI],
+    ["Defense", s.AGI >= 9 ? 2 : 1], [c.carryWeight ? "Carry weight" : "Carry weight (auto)", (c.carryWeight || autoCarry(s)) + " lbs"],
     ["Melee bonus", s.STR >= 11 ? "+3 CD" : s.STR >= 9 ? "+2 CD" : s.STR >= 7 ? "+1 CD" : "none"], ["Luck points", s.LCK],
   ];
 }
@@ -489,7 +509,7 @@ function renderRoster() {
           <button class="btn" id="ro-sug">&#9733; Suggest a perk</button></div>
         <div class="bar"><button class="btn" id="ro-edit">&#9998; Edit</button><button class="btn danger" id="ro-del">&#128465; Delete</button></div>
       </div>`;
-    setAvatar($("ro-av"), c.photo, c.name);
+    setAvatar($("ro-av"), c);
     $("ro-back").onclick = closeProfile;
     $("ro-edit").onclick = () => { fillForm(c); showPage("create"); };
     $("ro-lvl").onclick = () => {
@@ -511,7 +531,7 @@ function renderRoster() {
       <b>${esc(c.name)}</b><small>${esc(c.origin || "Unknown origin")} &middot; Lvl ${c.level || 1}${(c.perkCards || []).length ? ` &middot; ${c.perkCards.length} perk card${c.perkCards.length > 1 ? "s" : ""}` : ""}</small><br>
       <small>${G.SPECIAL.map(a => `${a} ${c.special[a]}`).join(" &middot; ")}</small></div>
       <button class="btn danger" data-del="${esc(c.id)}" title="Delete" style="flex:none;padding:8px 11px">&#128465;</button></div>`).join("") + "</div>";
-  list.querySelectorAll("[data-av]").forEach(el => { const c = ROSTER.find(x => x.id === el.dataset.av); setAvatar(el, c.photo, c.name); });
+  list.querySelectorAll("[data-av]").forEach(el => setAvatar(el, ROSTER.find(x => x.id === el.dataset.av)));
   list.querySelectorAll(".entry").forEach(el => (el.onclick = e => {
     if (e.target.closest("[data-del]")) return;
     openProfileId = el.dataset.id; renderRoster(); $("main").scrollTop = 0;

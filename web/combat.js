@@ -99,7 +99,8 @@ const Combat = (() => {
   }
   function fromCharacter(c) {
     const s = c.special;
-    Object.assign(setup, { charId: c.id, name: c.name, hp: s.END + s.LCK, maxHp: s.END + s.LCK,
+    const hp = c.maxHp || s.END + s.LCK;
+    Object.assign(setup, { charId: c.id, name: c.name, hp, maxHp: hp,
       def: s.AGI >= 9 ? 2 : 1, init: s.PER + s.AGI, meleeBonus: s.STR >= 11 ? 3 : s.STR >= 9 ? 2 : s.STR >= 7 ? 1 : 0 });
     updateTN();
   }
