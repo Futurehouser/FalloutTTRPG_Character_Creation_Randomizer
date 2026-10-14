@@ -25,8 +25,9 @@
     <button data-page="perks"><span class="n">4</span>Random FO76 Perk</button>
     <button data-page="create"><span class="n">5</span>Create Character</button>
     <button data-page="roster"><span class="n">6</span>Saved Characters</button>
+    <button id="nav-update"><span class="n">&#8635;</span>Check for updates</button>
   </nav>
-  <div class="foot">Fan-made tool for the Fallout 2d20 tabletop game.</div>
+  <div class="foot">Version <span id="app-version"></span><br>Fan-made tool for the Fallout 2d20 tabletop game.</div>
 </aside>
 
 <main id="main">
@@ -160,9 +161,20 @@
 
 <div class="modal" id="modal"><div class="box"><p id="modal-text"></p>
   <div class="bar"><button class="btn" id="modal-no">Cancel</button><button class="btn danger" id="modal-yes">Delete</button></div></div></div>
+<div class="modal" id="upd-modal"><div class="box">
+  <h3 id="upd-title" style="margin:0 0 8px;color:var(--amber)">Update available</h3>
+  <p id="upd-text"></p>
+  <pre id="upd-notes" class="notes" hidden></pre>
+  <div id="upd-bar" class="progress" hidden><div></div></div>
+  <p id="upd-status" class="muted" style="font-size:13px;margin:8px 0"></p>
+  <div class="bar"><button class="btn" id="upd-later">Not now</button><button class="btn primary" id="upd-go">Update now</button></div>
+  <button class="btn" id="upd-skip" style="width:100%;margin-top:8px;font-weight:600">Skip this version</button>
+</div></div>
 <div id="toast"></div>
 
+<script charset="utf-8" src="version.js"></script>
 <script charset="utf-8" src="platform.js"></script>
+<script charset="utf-8" src="updater.js"></script>
 <script charset="utf-8" src="sheet_data.js"></script>
 <script charset="utf-8" src="gamedata.js"></script>
 <script charset="utf-8" src="generator.js"></script>

@@ -2,9 +2,11 @@ package com.wasteland.recruit;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.PendingIntent;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.content.pm.PackageInstaller;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -14,6 +16,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.util.Base64;
 import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
@@ -26,12 +29,18 @@ import android.webkit.WebViewClient;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
+
+import org.json.JSONObject;
 
 /** Hosts the shared web app in a WebView and gives it storage, photo picking, saving and sharing. */
 public class MainActivity extends Activity {
     private static final int PICK_FILE = 7;
+    private static final String ACTION_INSTALL_DONE = "com.wasteland.recruit.INSTALL_DONE";
     private WebView web;
     private ValueCallback<Uri[]> pendingPick;
 
@@ -89,6 +98,82 @@ public class MainActivity extends Activity {
         }
     }
 
+    // ---------------------------------------------------------------- self-update
+    private void js(String code) {
+        runOnUiThread(() -> web.evaluateJavascript(code, null));
+    }
+
+    private void updateStatus(String msg, boolean finished) {
+        js("window.onUpdateStatus && onUpdateStatus(" + JSONObject.quote(msg) + "," + finished + ")");
+    }
+
+    /** Streams the APK straight into an Android install session; Android then asks the user to confirm. */
+    private void downloadAndInstall(String url, String version) {
+        PackageInstaller pi = getPackageManager().getPackageInstaller();
+        int sessionId = -1;
+        try {
+            HttpURLConnection c = (HttpURLConnection) new URL(url).openConnection();
+            c.setInstanceFollowRedirects(true);
+            c.setRequestProperty("User-Agent", "WastelandRecruit-updater");
+            c.setConnectTimeout(30000);
+            c.setReadTimeout(60000);
+            if (c.getResponseCode() != 200) throw new IllegalStateException("download answered " + c.getResponseCode());
+            long total = c.getContentLengthLong();
+            PackageInstaller.SessionParams params = new PackageInstaller.SessionParams(PackageInstaller.SessionParams.MODE_FULL_INSTALL);
+            params.setAppPackageName(getPackageName());
+            if (total > 0) params.setSize(total);
+            sessionId = pi.createSession(params);
+            try (PackageInstaller.Session s = pi.openSession(sessionId);
+                 InputStream in = c.getInputStream();
+                 OutputStream out = s.openWrite("update.apk", 0, total > 0 ? total : -1)) {
+                byte[] buf = new byte[1 << 16];
+                long done = 0;
+                int n, last = -1;
+                while ((n = in.read(buf)) > 0) {
+                    out.write(buf, 0, n);
+                    done += n;
+                    int pct = total > 0 ? (int) (done * 100 / total) : 0;
+                    if (pct != last) {
+                        last = pct;
+                        js("window.onUpdateProgress && onUpdateProgress(" + pct + ")");
+                    }
+                }
+                s.fsync(out);
+            }
+            Intent done = new Intent(this, MainActivity.class).setAction(ACTION_INSTALL_DONE)
+                    .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            int flags = PendingIntent.FLAG_UPDATE_CURRENT | (Build.VERSION.SDK_INT >= 31 ? PendingIntent.FLAG_MUTABLE : 0);
+            PendingIntent result = PendingIntent.getActivity(this, sessionId, done, flags);
+            try (PackageInstaller.Session s = pi.openSession(sessionId)) {
+                s.commit(result.getIntentSender());
+            }
+            updateStatus("Downloaded version " + version + ". Confirm the install on the next screen.", false);
+        } catch (Exception e) {
+            if (sessionId >= 0) {
+                try { pi.abandonSession(sessionId); } catch (Exception ignored) { }
+            }
+            updateStatus("Update failed: " + e.getMessage(), true);
+        }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        if (!ACTION_INSTALL_DONE.equals(intent.getAction())) return;
+        int st = intent.getIntExtra(PackageInstaller.EXTRA_STATUS, PackageInstaller.STATUS_FAILURE);
+        if (st == PackageInstaller.STATUS_PENDING_USER_ACTION) {
+            Intent confirm = intent.getParcelableExtra(Intent.EXTRA_INTENT);
+            if (confirm != null) startActivity(confirm); // Android's own "Do you want to update this app?" screen
+        } else if (st == PackageInstaller.STATUS_SUCCESS) {
+            updateStatus("Updated! Reopen the app if it doesn't restart by itself.", true);
+        } else {
+            String why = intent.getStringExtra(PackageInstaller.EXTRA_STATUS_MESSAGE);
+            if (st == PackageInstaller.STATUS_FAILURE_CONFLICT || st == PackageInstaller.STATUS_FAILURE_INCOMPATIBLE)
+                why = "the update is signed with a different key. Uninstall this version once and install the new APK by hand.";
+            updateStatus(st == PackageInstaller.STATUS_FAILURE_ABORTED ? "Update cancelled." : "Install failed: " + why, true);
+        }
+    }
+
     @Override
     public void onBackPressed() {
         web.evaluateJavascript("window.handleBack ? String(window.handleBack()) : 'false'", r -> {
@@ -141,6 +226,21 @@ public class MainActivity extends Activity {
     }
 
     class Bridge {
+        @JavascriptInterface
+        public String installUpdate(String url, String version) {
+            Uri u = Uri.parse(url);
+            String host = u.getHost() == null ? "" : u.getHost();
+            if (!"https".equals(u.getScheme()) || !(host.equals("github.com") || host.endsWith(".githubusercontent.com")))
+                return "ERROR: refusing to download from " + host;
+            if (!getPackageManager().canRequestPackageInstalls()) {
+                runOnUiThread(() -> startActivity(new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
+                        Uri.parse("package:" + getPackageName()))));
+                return "NEED_PERMISSION";
+            }
+            new Thread(() -> downloadAndInstall(url, version)).start();
+            return "STARTED";
+        }
+
         @JavascriptInterface
         public String load(String key) {
             File f = dataFile(key);

@@ -7,3 +7,21 @@ render.experimental.xml
 
 # Keystore files
 *.pub
+
+# ---- Wasteland Recruit ----
+# signing keys never go in the repository (the real one lives in ~/.wasteland-recruit)
+*.jks
+*.keystore
+FalloutCharGenAndroid/keystore/
+# personal data and generated sheets
+**/Wasteland Data/
+**/Fallout Characters/
+# build output (published through GitHub Releases instead)
+FalloutCharGen/dist/
+FalloutCharGen/build/
+FalloutCharGen/*.spec
+FalloutCharGenAndroid/build/
+FalloutCharGenAndroid/app/assets/www/
+*.apk
+*.apk.idsig
+*.exe

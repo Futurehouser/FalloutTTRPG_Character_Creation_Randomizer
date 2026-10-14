@@ -133,6 +133,10 @@ table.lt td.n { width: 64px; }
 .modal.show { display: grid; }
 .modal .box { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 18px; max-width: 380px; width: 100%; }
 .modal .box p { margin: 0 0 14px; line-height: 1.4; }
+.progress { height: 10px; border-radius: 6px; background: #0f1115; border: 1px solid var(--line); overflow: hidden; margin-top: 10px; }
+.progress div { height: 100%; width: 2%; background: var(--amber); transition: width .2s; }
+pre.notes { white-space: pre-wrap; font: 13px/1.4 inherit; max-height: 160px; overflow: auto; background: #0f1115; border: 1px solid var(--line);
+            border-radius: 8px; padding: 8px; margin: 0 0 6px; color: var(--muted); }
 #toast { position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%); background: #000d; color: var(--green); padding: 10px 16px;
          border-radius: 20px; font-size: 13px; opacity: 0; transition: opacity .3s; pointer-events: none; max-width: 90%; text-align: center; z-index: 50; }
 #toast.show { opacity: 1; }

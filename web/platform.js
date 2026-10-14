@@ -56,6 +56,19 @@ const Platform = (() => {
     return "Downloaded " + name;
   }
 
+  // Download + install a new version. Returns "STARTED", "NEED_PERMISSION" or "ERROR: ...".
+  // Progress and the final result arrive through window.onUpdateProgress / window.onUpdateStatus.
+  async function installUpdate(url, version, digest) {
+    await ready;
+    try {
+      if (isAndroid()) return AndroidBridge.installUpdate(url, version);
+      if (isDesktop()) return await window.pywebview.api.install_update(url, version, digest);
+    } catch (e) {
+      return "ERROR: " + e.message;
+    }
+    return "ERROR: updates only work in the Windows and Android apps";
+  }
+
   const canShare = () => isAndroid();
   function shareImage(dataUrl, name, title) {
     if (!isAndroid()) return "Sharing works in the Android app.";
@@ -63,5 +76,5 @@ const Platform = (() => {
     return r.startsWith("ERROR") ? r : "";
   }
 
-  return { ready, load, save, loadJSON, saveJSON, saveImage, canShare, shareImage, isAndroid, isDesktop };
+  return { ready, load, save, loadJSON, saveJSON, saveImage, canShare, shareImage, installUpdate, isAndroid, isDesktop };
 })();

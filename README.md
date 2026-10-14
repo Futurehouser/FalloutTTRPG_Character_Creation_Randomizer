@@ -2,9 +2,9 @@
 
 
 
-App for Windows [**Windows**](https://github.com/Futurehouser/FalloutTTRPG_Character_Creation_Randomizer/blob/main/FalloutCharGen/dist/WastelandRecruit.exe)
+App for Windows [**Windows**](https://github.com/Futurehouser/FalloutTTRPG_Character_Creation_Randomizer/releases/latest/download/WastelandRecruit.exe)
 
-App for Mobile [**Mobile**](https://github.com/Futurehouser/FalloutTTRPG\_Character\_Creation\_Randomizer/blob/main/FalloutCharGenAndroid/WastelandRecruit.apk)
+App for Mobile [**Mobile**](https://github.com/Futurehouser/FalloutTTRPG_Character_Creation_Randomizer/releases/latest/download/WastelandRecruit.apk)
 
 
 
@@ -32,9 +32,27 @@ Names: made by mixing Fallout names for each race:
 
 Gimmick: each character gets a nickname and a personality quirk based on their highest S.P.E.C.I.A.L. score, their lowest one and their perk. For example, Endurance 10 with low Charisma and the Pain Train perk gave “Unkillable”, who eats week-old mirelurk but whose small talk peaks at grunting, and who blows a train whistle before every charge. The quirk goes in the Perks \& Traits list. A “Wasteland Dossier” strip under the sheet holds the longer backstory and notes on the choices it made.
 
-The source code is gamedata.py has the rules data, generator.py builds the character and render.py fills in the sheet.
+The source code lives in the `web` folder, which both apps share: gamedata.js has the rules data, generator.js builds the character and render.js fills in the sheet. `FalloutCharGen/desktop_app.py` is the Windows wrapper and `FalloutCharGenAndroid` holds the Android wrapper.
 
-The app is "FalloutCharGen.exe". You can move the exe anywhere, since it’s a single file. New characters are saved in a Fallout Characters folder next to wherever the exe is.
+The Windows app is "WastelandRecruit.exe". You can move the exe anywhere, since it’s a single file. New characters are saved in a Fallout Characters folder next to wherever the exe is.
 
-The android version app is located within "FalloutCharGenAndroid" folder, and it is "WastelandRecruit.apk". Just download that apk file to your android device and install it. Allow the installation anyways if your device doesn't trust the app.
+The Android app is "WastelandRecruit.apk" (link above). Just download that apk file to your android device and install it. Allow the installation anyways if your device doesn't trust the app.
+
+# Updates
+
+Both apps check this repository's latest GitHub Release when they open. If there is a newer version they ask first, then download it, check it and install it (Android shows its own install confirmation). The menu also has "Check for updates".
+
+## Releasing a new version
+
+1. Push your changes to `main`.
+2. On GitHub: **Releases → Draft a new release → Choose a tag**, type a new tag such as `v4.1.0` (always higher than the last one), add notes about what changed, and press **Publish release**.
+3. The **Build release files** action (`.github/workflows/release.yml`) builds `WastelandRecruit.exe` and `WastelandRecruit.apk` with that version number and attaches them to the release. It takes about 5 minutes; watch it in the **Actions** tab.
+
+The Android build needs two repository secrets (**Settings → Secrets and variables → Actions**): `ANDROID_KEYSTORE_B64` and `ANDROID_KEYSTORE_PASSWORD`. The signing key itself is never stored in this repository.
+
+## Building on your own computer
+
+* Windows exe: from `FalloutCharGen`, run `python -m PyInstaller --noconfirm --onefile --windowed --name WastelandRecruit --icon assets/app.ico --add-data "../web;web" desktop_app.py`
+* Android APK: from `FalloutCharGenAndroid`, run `bash build_apk.sh` (needs the Android SDK build tools and the signing key in `~/.wasteland-recruit`).
+* The version number for local builds is in `web/version.js`.
 

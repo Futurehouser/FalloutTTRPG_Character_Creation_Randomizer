@@ -35,9 +35,12 @@ function showPage(id) {
 $("burger").onclick = () => document.body.classList.toggle("menu-open");
 $("scrim").onclick = () => document.body.classList.remove("menu-open");
 document.querySelectorAll("#nav button").forEach(b => (b.onclick = () => showPage(b.dataset.page)));
+$("app-version").textContent = APP_VERSION;
+$("nav-update").onclick = () => { document.body.classList.remove("menu-open"); Updater.check(true); };
 // Android back button: close menu / profile / modal before leaving the app
 window.handleBack = () => {
   if ($("modal").classList.contains("show")) { $("modal-no").click(); return true; }
+  if ($("upd-modal").classList.contains("show")) { $("upd-later").click(); return true; }
   if (document.body.classList.contains("menu-open")) { document.body.classList.remove("menu-open"); return true; }
   if (currentPage === "roster" && openProfileId) { closeProfile(); return true; }
   if (currentPage !== "chargen") { showPage("chargen"); return true; }
@@ -530,4 +533,5 @@ async function deleteChar(c) {
   showPage($("page-" + start) ? start : "chargen");
   await Promise.all([loadRoster(), loadLootOverrides()]);
   buildLootEditor();
+  setTimeout(() => Updater.check(false), 1500); // ask about new versions on startup
 })();
