@@ -1,4 +1,5 @@
-<img width="1904" height="1032" alt="FOTTRPG_README" src="https://github.com/user-attachments/assets/a8a5331d-1650-4e5a-bcf5-275c8f8d9cff" />
+<img width="1919" height="1003" alt="Screenshot 2026-10-14 201054" src="https://github.com/user-attachments/assets/87aa77e6-4c54-49f2-80f9-ca07d51e6699" />
+
 
 ## Download latest App Release [here](https://github.com/Futurehouser/FalloutTTRPG_Wasteland_Recruit/releases/latest)
 
