@@ -25,6 +25,7 @@
     <button data-page="perks"><span class="n">4</span>Random FO76 Perk</button>
     <button data-page="create"><span class="n">5</span>Create Character</button>
     <button data-page="roster"><span class="n">6</span>Saved Characters</button>
+    <button data-page="combat"><span class="n">7</span>Combat Assistant</button>
     <button id="nav-update"><span class="n">&#8635;</span>Check for updates</button>
   </nav>
   <div class="foot">Version <span id="app-version"></span><br>Fan-made tool for the Fallout 2d20 tabletop game.</div>
@@ -151,6 +152,14 @@
     <div class="bar"><button class="btn" id="cr-clear">Clear form</button></div>
   </section>
 
+  <!-- 7. combat assistant -->
+  <section class="page" id="page-combat" data-title="Combat Assistant">
+    <h2>Combat Assistant</h2>
+    <p class="hint">Set up you, your weapon and the enemies, then the app walks you through every attack: to-hit roll, hit location,
+      damage, effects and HP for everyone. Type in your own dice, or tap Roll for me. The fight is saved as you go.</p>
+    <div id="cb-root"></div>
+  </section>
+
   <!-- 6. roster -->
   <section class="page" id="page-roster" data-title="Saved Characters">
     <h2>Saved Characters</h2>
@@ -183,5 +192,7 @@
 <script charset="utf-8" src="scavenge.js"></script>
 <script charset="utf-8" src="perks.js"></script>
 <script charset="utf-8" src="app.js"></script>
+<script charset="utf-8" src="enemies.js"></script>
+<script charset="utf-8" src="combat.js"></script>
 </body>
 </html>

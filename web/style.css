@@ -137,6 +137,29 @@ table.lt td.n { width: 64px; }
 .progress div { height: 100%; width: 2%; background: var(--amber); transition: width .2s; }
 pre.notes { white-space: pre-wrap; font: 13px/1.4 inherit; max-height: 160px; overflow: auto; background: #0f1115; border: 1px solid var(--line);
             border-radius: 8px; padding: 8px; margin: 0 0 6px; color: var(--muted); }
+/* combat assistant */
+.effs { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 14px; align-items: center; }
+.effs label { display: inline-flex; gap: 6px; align-items: center; }
+.effs input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--amber); }
+.dice-in { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 6px 0; }
+.dice-in input { width: 64px; text-align: center; padding: 9px 4px; font-size: 17px; font-weight: 800; }
+.fighter { display: flex; gap: 10px; align-items: center; padding: 10px; margin: 6px 0; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; }
+.fighter .t { flex: 1; min-width: 0; }
+.fighter .t b { color: var(--amber); }
+.fighter .t small { display: block; color: var(--muted); }
+.fighter.now { border-color: var(--amber); box-shadow: 0 0 0 1px var(--amber) inset; }
+.fighter.down { opacity: .55; }
+.fighter .deal { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
+.fighter .btn { flex: none; padding: 8px 10px; }
+.hpbar { height: 8px; border-radius: 5px; background: #0f1115; border: 1px solid var(--line); overflow: hidden; margin-top: 5px; }
+.hpbar div { height: 100%; transition: width .3s; }
+button.mini { padding: 0 7px; margin-left: 4px; border-radius: 6px; border: 1px solid var(--line); background: var(--panel2); cursor: pointer; }
+#cb-turn h3 { margin: 0 0 6px; color: var(--amber); }
+#cb-turn p { line-height: 1.45; }
+h4.sec { margin: 16px 0 4px; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); }
+.log { font-size: 13px; line-height: 1.5; max-height: 260px; overflow: auto; margin-top: 8px; color: var(--muted); }
+.victory { border-color: var(--amber); text-align: left; }
+.vt { font-size: 28px; font-weight: 900; letter-spacing: 3px; color: var(--amber); text-align: center; margin: 6px 0 10px; }
 #toast { position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%); background: #000d; color: var(--green); padding: 10px 16px;
          border-radius: 20px; font-size: 13px; opacity: 0; transition: opacity .3s; pointer-events: none; max-width: 90%; text-align: center; z-index: 50; }
 #toast.show { opacity: 1; }

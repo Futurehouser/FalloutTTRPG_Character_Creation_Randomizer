@@ -31,6 +31,7 @@ function showPage(id) {
   if (id === "roster") renderRoster();
   if (id === "perks") fillCharSelect();
   if (id === "create") fillPerkList();
+  if (id === "combat" && typeof Combat !== "undefined") Combat.show();
 }
 $("burger").onclick = () => document.body.classList.toggle("menu-open");
 $("scrim").onclick = () => document.body.classList.remove("menu-open");
