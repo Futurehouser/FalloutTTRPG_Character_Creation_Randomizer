@@ -2,4 +2,4 @@
 // overwrites it with the release tag (v4.0.0 -> "4.0.0") when it builds a release.
 const APP_VERSION = "4.2.0";
 // GitHub repository whose Releases are checked for updates
-const UPDATE_REPO = "Futurehouser/FalloutTTRPG_Character_Creation_Randomizer";
+const UPDATE_REPO = "Futurehouser/FalloutTTRPG_Wasteland_Recruit";
