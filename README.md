@@ -2,10 +2,7 @@
 
 
 
-App for Windows [**Windows**](https://github.com/Futurehouser/FalloutTTRPG_Character_Creation_Randomizer/releases/latest/download/WastelandRecruit.exe)
-
-App for Mobile [**Mobile**](https://github.com/Futurehouser/FalloutTTRPG_Character_Creation_Randomizer/releases/latest/download/WastelandRecruit.apk)
-
+Download PC and Mobile App here [**Latest Release**](https://github.com/Futurehouser/FalloutTTRPG_Character_Creation_Randomizer/releases/tag/v4.1.0)
 
 
 # Rules from the Character Creation chapter from the Fallout 111 Table Top Roleplay Core Rulebook that the app follows:
