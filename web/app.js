@@ -20,7 +20,7 @@ const clamp = (v, lo, hi, d) => { v = parseInt(v, 10); return isNaN(v) ? d : Mat
 const safeName = s => (String(s).replace(/[^A-Za-z0-9 _-]+/g, "").trim().replace(/ /g, "_") || "character");
 
 // ------------------------------------------------------------------ navigation
-let currentPage = "chargen";
+let currentPage = "home";
 function showPage(id) {
   document.querySelectorAll(".page").forEach(p => p.classList.toggle("active", p.id === "page-" + id));
   document.querySelectorAll("#nav button").forEach(b => b.classList.toggle("active", b.dataset.page === id));
@@ -35,7 +35,8 @@ function showPage(id) {
 }
 $("burger").onclick = () => document.body.classList.toggle("menu-open");
 $("scrim").onclick = () => document.body.classList.remove("menu-open");
-document.querySelectorAll("#nav button").forEach(b => (b.onclick = () => showPage(b.dataset.page)));
+document.querySelectorAll("#nav button[data-page]").forEach(b => (b.onclick = () => showPage(b.dataset.page)));
+document.querySelectorAll(".tile[data-go]").forEach(b => (b.onclick = () => showPage(b.dataset.go)));
 $("app-version").textContent = APP_VERSION;
 $("nav-update").onclick = () => { document.body.classList.remove("menu-open"); Updater.check(true); };
 // Android back button: close menu / profile / modal before leaving the app
@@ -44,7 +45,7 @@ window.handleBack = () => {
   if ($("upd-modal").classList.contains("show")) { $("upd-later").click(); return true; }
   if (document.body.classList.contains("menu-open")) { document.body.classList.remove("menu-open"); return true; }
   if (currentPage === "roster" && openProfileId) { closeProfile(); return true; }
-  if (currentPage !== "chargen") { showPage("chargen"); return true; }
+  if (currentPage !== "home") { showPage("home"); return true; }
   return false;
 };
 
@@ -551,7 +552,7 @@ async function deleteChar(c) {
 // ------------------------------------------------------------------ start
 (async () => {
   const start = location.hash.slice(1);
-  showPage($("page-" + start) ? start : "chargen");
+  showPage($("page-" + start) ? start : "home");
   await Promise.all([loadRoster(), loadLootOverrides()]);
   buildLootEditor();
   setTimeout(() => Updater.check(false), 1500); // ask about new versions on startup

@@ -11,7 +11,7 @@
   <button class="burger" id="burger" aria-label="Open menu">&#9776;</button>
   <div style="min-width:0">
     <h1>&#9762; Wasteland Recruit</h1>
-    <div class="where" id="where">Character Generator</div>
+    <div class="where" id="where">Home</div>
   </div>
 </div>
 
@@ -19,6 +19,7 @@
 <aside class="drawer" id="drawer">
   <div class="brand"><div class="logo">&#9762;</div><div><b>WASTELAND RECRUIT</b><span>Fallout 2d20 game master tools</span></div></div>
   <nav id="nav">
+    <button data-page="home"><span class="n">&#8962;</span>Home</button>
     <button data-page="chargen"><span class="n">1</span>Random Character</button>
     <button data-page="scavenge"><span class="n">2</span>Scavenging Location</button>
     <button data-page="loot"><span class="n">3</span>Loot Roller</button>
@@ -32,6 +33,24 @@
 </aside>
 
 <main id="main">
+  <!-- home -->
+  <section class="page" id="page-home" data-title="Home">
+    <div class="home-title">
+      <div class="home-logo">&#9762;</div>
+      <h1>Wasteland Recruit</h1>
+      <p>Your Fallout 2d20 companion</p>
+    </div>
+    <div class="tiles">
+      <button class="tile" data-go="chargen"><span class="ic">&#127922;</span><b>Random Character</b><small>Roll a full level-1 character and sheet</small></button>
+      <button class="tile" data-go="scavenge"><span class="ic">&#127962;</span><b>Scavenging Location</b><small>Build a place to loot</small></button>
+      <button class="tile" data-go="loot"><span class="ic">&#128176;</span><b>Loot Roller</b><small>Turn a 2d20 roll into an item</small></button>
+      <button class="tile" data-go="perks"><span class="ic">&#127183;</span><b>Random FO76 Perk</b><small>Draw or get a suggested perk card</small></button>
+      <button class="tile" data-go="create"><span class="ic">&#9998;</span><b>Create Character</b><small>Enter your own character</small></button>
+      <button class="tile" data-go="roster"><span class="ic">&#128101;</span><b>Saved Characters</b><small>Your party: view, edit, level up</small></button>
+      <button class="tile" data-go="combat"><span class="ic">&#9876;</span><b>Combat Assistant</b><small>Run a fight step by step</small></button>
+    </div>
+  </section>
+
   <!-- 1. random character -->
   <section class="page" id="page-chargen" data-title="Random Character">
     <h2>Random Character</h2>
